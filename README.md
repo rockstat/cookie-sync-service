@@ -23,14 +23,27 @@ make start-dev
 
 To start service in production mode use Rockstat dashboard located at `app.YOUR-TRACKING-DOMAIN`
 
-## Sync ways
+## Synchronization
 
-Complete way
 
 `init` -> `sync` -> `done` but depends on initiator side can be:
 
 - `init:local` -> `sync:remote` -> `done:local`
 - `init:remote` -> `sync:local` -> `done:remote`
+
+
+```mermaid
+sequenceDiagram
+    participant Side1
+    participant Browser
+    
+    Browser-->>Side1: GET server/init?pt=side2
+    Side1->>Browser: 302 Redirect target/sync?pt=side1&ptid=12345
+    Browser->>Side2: GET target/sync?pt=side1&ptid=12345
+    Side2->>Browser: 302 Redirect server/done?pt=side2&ptid=abcdef&uid=12345
+    Browser->>Side1: GET server/done?pt=side2&ptid=abcdef&uid=12345
+    Side1->>Browser: 200 OK image/gif
+```
 
 #### Initialize synchronization
 
