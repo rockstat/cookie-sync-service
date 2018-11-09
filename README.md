@@ -1,129 +1,61 @@
 # Rockstat cookie-sync service example
 
+For configuration example look at `config.yml`
+
+## Clone
+
+Open Theia IDE, new terminal, then clone to `my_images` with `cookiesync` name.
+
+```
+cd my_images
+git clone https://github.com/rockstat/cookie-sync-service.git cookiesync
+```
+
 ## Hot to start
 
 For testing purposes run `make start-dev`. 
-To start service in production mode use Rockstat dashboard located at `app.YOUR-TRACKING-DOMAIN`
-
-### Structure
+Suppose your at `my_images/` folder
 
 ```
-my_images
-| - your_service_name
-    | - .dockerignore
-    | - config.yaml
-    | - Dockerfile
-    | - requirements.txt
-    | - start_dev
-    | - your_service_name
-        | - __init__.py
-        | - __main__.py
-        | - main.py
-```
-
-### Short introduction into Band services.
-
-All of code splitting in logocal services. Service can contains number of functions, that can exposed to other services or event outside (to works) using `front` service proxing mechanics. Each function can take one of roles:
-
-- **listener**: listene for all events matching provided key. That role uses database writers and streaming services
-- **enricher**: provides additional data chunks (enrichments) for events matched provided rules. Returened data will be attached to incoming event
-- **handler**: fucnctin which result will be returned back to request initiator
-
-Moreover you can define function as woker which load initial data or packet hanldle incoming data
-
-- **task**: worker function
-
-### Build your service
-
-Look at the `yourservice/yourservice/main.py` template. It contains typical example 
-
-### Running for debug
-
-execute 
-```
+cd cookiesync
 make start-dev
 ```
 
-### Env variables
+To start service in production mode use Rockstat dashboard located at `app.YOUR-TRACKING-DOMAIN`
+
+## Sync ways
+
+Complete way
+
+`init` -> `sync` -> `done` but depends on initiator side can be:
+
+- `init:local` -> `sync:remote` -> `done:local`
+- `init:remote` -> `sync:local` -> `done:remote`
+
+#### Initialize synchronization
+
+Start at
+`https://YOURDOMAIN/cookiesync/init?partner={partner_name}`. 
+
+Will be redirected to partner `sync` location. Otherwice pixel will be returned and written error to logs.
+
+
+#### Synchronization process
+
+`https://YOURDOMAIN/cookiesync/sync?partner={partner_name}&partner_id={partner_id}`.
+
+Will be redirected to partner `done` location. If error occur will be returned pixel.
+
+#### Finishing process 
+
+Receiving syncronization results and show pixel
+
+`https://YOURDOMAIN/cookiesync/done?partner={partner_name}&partner_id={partner_id}&user_id={user_id}`.
+
+## Env variables
 
 Possible to store vars at: `.env`, `.env.local`. 
 These paths was excluded from git to avoid of commit sensitive data.
-
-### Old skeleton example
-
-
-```python
-import asyncio
-from itertools import count
-from prodict import Prodict as pdict
-from band import expose, cleanup, worker, settings, logger, response
-
-
-"""
-Service state
-"""
-state = pdict(
-    counter=settings.initial_counter_value,
-    loaded=False,
-    loop=0
-)
-
-
-@expose.handler()
-async def main(data, **params):
-    """
-    Registering handler which can be accessible through http
-    Регистрируем обработчика запросов
-    """
-    return state
-
-
-@expose.handler()
-async def tick(data, **params):
-    """
-    Second method, for example request counter
-    Еще один метод6 в касестве проимера считающий запросы
-    """
-    return {}
-
-
-@worker()
-async def service_worker():
-    """
-    Это каркас воркера, который используется для начально 
-    загрузки/подготовки данных и последующей оброботки новых данных
-    вызывается при инициализации приложения
-    """
-    for num in count():
-        """
-        Avoid crush
-        """
-        try:
-            """
-            initial execution
-            """
-            if num == 0:
-                state.loaded = True
-            """
-            periodically execution
-            """
-            state.loop = num
-        except asyncio.CancelledError:
-            break
-        except Exception:
-            logger.exception('my service exeption')
-        await asyncio.sleep(30)
-
-
-@cleanup()
-async def service_cleanup():
-    """
-    Handle graceful shutdown
-    Операции выполняемые при завершении
-    """
-    state.loaded = False
-```
-
 
 ## License
 

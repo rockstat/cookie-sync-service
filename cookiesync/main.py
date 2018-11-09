@@ -31,6 +31,10 @@ async def save_match(uid, partner, partner_id):
 
 @expose.handler()
 async def init(uid, data, **params):
+    """
+    Will be redirected to partner `sync` location. 
+    Otherwice pixel will be returned and written error to logs.
+    """
     partner_name = data.get('partner', None)
     partner = get_partner(partner_name)
     if partner and partner.init:
@@ -43,6 +47,10 @@ async def init(uid, data, **params):
 
 @expose.handler()
 async def sync(uid, data, **params):
+    """
+    Will be redirected to partner `done` location. 
+    If error occur will be returned pixel.
+    """
     partner_name = data.pop('partner', None)
     partner_id = data.pop('partner_id', None)
     partner = get_partner(partner_name)
@@ -59,6 +67,9 @@ async def sync(uid, data, **params):
 
 @expose.handler()
 async def done(uid, data, **params):
+    """
+    Receiving syncronization results and show pixel
+    """
     partner_name = data.pop('partner', None)
     partner_id = data.pop('partner_id', None)
     partner = get_partner(partner_name)
