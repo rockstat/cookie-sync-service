@@ -58,7 +58,7 @@ Matched available via RPC method `matches`
 
 ```py
 from band import rpc
-rpc.request('cookiesync', uid=)
+matches = await rpc.request('cookiesync', uid=uidvar)
 ```
 
 call emulation:
