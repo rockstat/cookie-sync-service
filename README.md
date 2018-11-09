@@ -1,4 +1,4 @@
-# Band service skeleton
+# Rockstat cookie-sync service example
 
 ## Hot to start
 
