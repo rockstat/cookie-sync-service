@@ -10,3 +10,7 @@ class Partner:
 class State(Prodict):
     redis_pool: ConnectionsPool
     partners: Prodict
+
+    def get_partner(self, partner) -> Partner:
+        if partner:
+            return self.partners.get(partner, None)

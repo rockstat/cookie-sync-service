@@ -52,6 +52,22 @@ Receiving syncronization results and show pixel
 
 `https://YOURDOMAIN/cookiesync/done?partner={partner_name}&partner_id={partner_id}&user_id={user_id}`.
 
+#### Getting matches
+
+Matched available via RPC method `matches`
+
+```py
+from band import rpc
+rpc.request('cookiesync', uid=)
+```
+
+call emulation:
+
+```
+curl http://127.0.0.1:10000/call/cookiesync/matches?uid=6461045793582219264
+{"rstatbolt":"6450101900745375744"}
+```
+
 ## Env variables
 
 Possible to store vars at: `.env`, `.env.local`. 

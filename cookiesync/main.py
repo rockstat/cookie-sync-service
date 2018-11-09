@@ -3,30 +3,29 @@ Rockstat cookie-sync service example
 (c) Dmitry Rodin 2018
 ---------------------
 """
+
+
 from band import expose, cleanup, worker, settings, logger, response, redis_factory
 from .struct import State, Partner
+from .helpers import pairs, gen_key
 
 
 state = State(partners=settings.partners)
 
 
-def gen_key(uid, section='s'):
-    """
-    Generate store key for own user
-    """
-    return f'cs:{section}:{uid}'.encode()
-
-
-def get_partner(partner) -> Partner:
-    if partner:
-        return state.partners.get(partner, None)
-
-
 async def save_match(uid, partner, partner_id):
     if state.redis_pool:
         with await state.redis_pool as conn:
-            return await conn.execute('hmset', gen_key(uid), partner, partner_id)
+            return await conn.execute('HMSET', gen_key(uid), partner, partner_id)
     logger.warn('redis pool not ready')
+
+
+@expose()
+async def matches(uid):
+    if state.redis_pool:
+        with await state.redis_pool as conn:
+            matches = await conn.execute('HGETALL', gen_key(uid))
+            return {k: v for k, v in pairs(matches or [])}
 
 
 @expose.handler()
@@ -36,7 +35,7 @@ async def init(uid, data, **params):
     Otherwice pixel will be returned and written error to logs.
     """
     partner_name = data.get('partner', None)
-    partner = get_partner(partner_name)
+    partner = state.get_partner(partner_name)
     if partner and partner.init:
         logger.info('init: partner and init link found. redirecting')
         pix = partner.init.format(partner_id=uid)
@@ -53,7 +52,7 @@ async def sync(uid, data, **params):
     """
     partner_name = data.pop('partner', None)
     partner_id = data.pop('partner_id', None)
-    partner = get_partner(partner_name)
+    partner = state.get_partner(partner_name)
     if partner and partner_id:
         logger.info('sync: partner found. saving match', p=partner_name)
         await save_match(uid, partner_name, partner_id)
@@ -72,7 +71,7 @@ async def done(uid, data, **params):
     """
     partner_name = data.pop('partner', None)
     partner_id = data.pop('partner_id', None)
-    partner = get_partner(partner_name)
+    partner = state.get_partner(partner_name)
     user_id = data.pop('user_id', None)
     if uid != user_id:
         logger.warn('user ids not equal')
