@@ -13,7 +13,7 @@ git clone https://github.com/rockstat/cookie-sync-service.git cookiesync
 
 ## Hot to start
 
-For testing purposes run `make start-dev`. 
+For testing purposes run `make start-dev`.
 Suppose your at `my_images/` folder
 
 ```
@@ -36,23 +36,23 @@ To start service in production mode use Rockstat dashboard located at `app.YOUR-
 
 #### Initialize synchronization
 
-Start at
-`https://YOURDOMAIN/cookiesync/init?partner={partner_name}`. 
+Start at `i` - `init`
+`https://YOURDOMAIN/cookiesync/i?p={partner}`.
 
-Will be redirected to partner `sync` location. Otherwice pixel will be returned and written error to logs.
+Will be redirected to partner `s` - `sync` location. Otherwice pixel will be returned and written error to logs.
 
 
 #### Synchronization process
 
-`https://YOURDOMAIN/cookiesync/sync?partner={partner_name}&partner_id={partner_id}`.
+`https://YOURDOMAIN/cookiesync/sync?p={partner}&pi={partner_id}`.
 
 Will be redirected to partner `done` location. If error occur will be returned pixel.
 
-#### Finishing process 
+#### Finishing process
 
-Receiving syncronization results and show pixel
+Receiving syncronization results and show pixel `d` - `done`
 
-`https://YOURDOMAIN/cookiesync/done?partner={partner_name}&partner_id={partner_id}&user_id={user_id}`.
+`https://YOURDOMAIN/cookiesync/done?p={partner_name}&pi={partner_id}&ui={user_id}`.
 
 #### Getting matches
 
@@ -60,7 +60,7 @@ Matched available via RPC method `matches`
 
 ```py
 from band import rpc
-matches = await rpc.request('cookiesync', uid=uidvar)
+matches = await rpc.request('cookiesync', 'matches', uid=uidvar)
 ```
 
 call emulation:
@@ -72,7 +72,7 @@ curl http://127.0.0.1:10000/call/cookiesync/matches?uid=6461045793582219264
 
 ## Env variables
 
-Possible to store vars at: `.env`, `.env.local`. 
+Possible to store vars at: `.env`, `.env.local`.
 These paths was excluded from git to avoid of commit sensitive data.
 
 ## License

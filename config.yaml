@@ -9,6 +9,5 @@ ch_dsn: "{{CHP_DSN|default('http://default:default@host:9090') }}"
 
 partners:
     rstatbolt:
-        init: https://bolt.rstat.org/cookiesync/sync.gif?partner={{PARTNER}}&partner_id={partner_id}
-        sync: https://bolt.rstat.org/cookiesync/done.gif?partner={{PARTNER}}&partner_id={partner_id}&user_id={user_id}
-
+        init: https://bolt.rstat.org/cs/s.gif?p={{PARTNER}}&pi={partner_id}
+        sync: https://bolt.rstat.org/cs/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
