@@ -8,7 +8,9 @@ redis_dsn: "{{ REDIS_DSN|default('redis://redis:6379') }}"
 ch_dsn: "{{CHP_DSN|default('http://default:default@host:9090') }}"
 
 partners:
-    rstatbolt:
-        init: https://bolt.rstat.org/cookiesync/sync.gif?partner={{PARTNER}}&partner_id={partner_id}
-        sync: https://bolt.rstat.org/cookiesync/done.gif?partner={{PARTNER}}&partner_id={partner_id}&user_id={user_id}
-
+    local:
+        init: https://stat.rock.dev/cs/s.gif?p={{PARTNER}}&pi={partner_id}
+        sync: https://stat.rock.dev/cc/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
+    x011:
+        init: https://0x011.xyz/cs/s.gif?p={{PARTNER}}&pi={partner_id}
+        sync: https://0x011.xyz/cs/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
