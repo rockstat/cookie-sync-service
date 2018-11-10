@@ -3,10 +3,8 @@ Rockstat cookie-sync service example
 (c) Dmitry Rodin 2018
 ---------------------
 """
-
-
 from band import expose, cleanup, worker, settings, logger, response, redis_factory
-from .struct import State, Partner
+from .struct import State
 from .helpers import pairs, gen_key
 
 
@@ -28,13 +26,13 @@ async def matches(uid):
             return {k: v for k, v in pairs(matches or [])}
 
 
-@expose.handler()
+@expose.handler(alias='cs', name='i')
 async def init(uid, data, **params):
     """
-    Will be redirected to partner `sync` location. 
+    Will be redirected to partner `sync` location.
     Otherwice pixel will be returned and written error to logs.
     """
-    partner_name = data.get('partner', None)
+    partner_name = data.get('p', None)
     partner = state.get_partner(partner_name)
     if partner and partner.init:
         logger.info('init: partner and init link found. redirecting')
@@ -44,14 +42,14 @@ async def init(uid, data, **params):
     return response.pixel()
 
 
-@expose.handler()
+@expose.handler(alias='cs', name='s')
 async def sync(uid, data, **params):
     """
-    Will be redirected to partner `done` location. 
+    Will be redirected to partner `done` location.
     If error occur will be returned pixel.
     """
-    partner_name = data.pop('partner', None)
-    partner_id = data.pop('partner_id', None)
+    partner_name = data.pop('p', None)
+    partner_id = data.pop('pi', None)
     partner = state.get_partner(partner_name)
     if partner and partner_id:
         logger.info('sync: partner found. saving match', p=partner_name)
@@ -64,15 +62,15 @@ async def sync(uid, data, **params):
     return response.pixel()
 
 
-@expose.handler()
+@expose.handler(alias='cs', name='d')
 async def done(uid, data, **params):
     """
     Receiving syncronization results and show pixel
     """
-    partner_name = data.pop('partner', None)
-    partner_id = data.pop('partner_id', None)
+    partner_name = data.pop('p', None)
+    partner_id = data.pop('pi', None)
     partner = state.get_partner(partner_name)
-    user_id = data.pop('user_id', None)
+    user_id = data.pop('ui', None)
     if uid != user_id:
         logger.warn('user ids not equal')
         return response.pixel()
