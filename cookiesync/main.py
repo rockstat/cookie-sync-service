@@ -3,19 +3,18 @@ Rockstat cookie-sync service example
 (c) Dmitry Rodin 2018
 ---------------------
 """
-from band import expose, cleanup, worker, settings, logger, response, redis_factory
-from .struct import State
-from .helpers import pairs, gen_key
+from band import expose, settings, logger, response, rpc
+from .struct import State, ServiceId
+from .helpers import pairs, gen_key, ms
 
 
 state = State(partners=settings.partners)
 
 
 async def save_match(uid, partner, partner_id):
-    if state.redis_pool:
-        with await state.redis_pool as conn:
-            return await conn.execute('HMSET', gen_key(uid), partner, partner_id)
-    logger.warn('redis pool not ready')
+    sid = ServiceId('uid', uid)
+    pid = ServiceId(partner, partner_id)
+    return await rpc.request('id', 'update', service_id=sid, ids=[[pid, ms()]])
 
 
 @expose()
@@ -80,14 +79,3 @@ async def done(uid, data, **params):
     else:
         logger.warn('not enough params', p=partner_name, pid=partner_id, u=user_id)
     return response.pixel()
-
-
-@worker()
-async def startup():
-    state.redis_pool = await redis_factory.create_pool()
-
-
-@cleanup()
-async def shutdown():
-    state.redis_pool.close()
-    await state.redis_pool.wait_closed()

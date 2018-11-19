@@ -1,6 +1,11 @@
 """
 Library
 """
+from time import time
+
+
+def ms():
+    return round(time()*1000)
 
 
 def pairs(l):
@@ -17,4 +22,3 @@ def gen_key(uid, section='s'):
     Generate store key for own user
     """
     return f'cs:{section}:{uid}'.encode()
-

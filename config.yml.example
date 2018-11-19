@@ -8,12 +8,6 @@ redis_dsn: "{{ REDIS_DSN|default('redis://redis:6379') }}"
 ch_dsn: "{{CHP_DSN|default('http://default:default@host:9090') }}"
 
 partners:
-    local:
-        init: https://stat.rock.dev/cs/s.gif?p={{PARTNER}}&pi={partner_id}
-        sync: https://stat.rock.dev/cc/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
     x011:
         init: https://0x011.xyz/cs/s.gif?p={{PARTNER}}&pi={partner_id}
         sync: https://0x011.xyz/cs/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
-    anal:
-        init: https://analytics.virginsclub.ru/v3/cs/s.gif?p={{PARTNER}}&pi={partner_id}
-        sync: https://analytics.virginsclub.ru/v3/cc/d.gif?p={{PARTNER}}&pi={partner_id}&ui={user_id}
